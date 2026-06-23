@@ -1,0 +1,25 @@
+{
+  "name": "mundial-2026-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard interactivo de análisis estratégico Nike vs Adidas - Mundial 2026",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [
+    "dashboard",
+    "analytics",
+    "mundial-2026",
+    "nike",
+    "adidas",
+    "marketing",
+    "estrategia"
+  ],
+  "author": "Tu Nombre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/mundial-2026-dashboard.git"
+  }
+}

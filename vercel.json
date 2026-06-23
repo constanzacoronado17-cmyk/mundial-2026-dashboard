@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "buildCommand": "echo 'Static HTML - no build needed'",
+  "outputDirectory": ".",
+  "public": true,
+  "env": {},
+  "regions": ["syd"],
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA World Cup 2026 - Strategic Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Fredoka:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --rojo: #FF1414;
+            --azul: #0052CC;
+            --purpura: #7C3AED;
+            --verde-lima: #CCFF00;
+            --amarillo: #FFD600;
+            --naranja: #FF6600;
+            --blanco: #FFFFFF;
+            --negro: #000000;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fc;
+            color: #1a1a1a;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo profesional con elementos del Mundial */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(255, 20, 20, 0.04) 0%, transparent 5%, transparent 95%, rgba(255, 20, 20, 0.04) 100%),
+                linear-gradient(0deg, rgba(255, 214, 0, 0.02) 0%, transparent 1%, transparent 99%, rgba(255, 214, 0, 0.02) 100%),
+                linear-gradient(180deg, rgba(0, 82, 204, 0.03) 0%, transparent 50%, transparent 100%);
+            background-size: 100% 100%, 100% 20px, 100% 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Elemento decorativo fluido fondo */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -300px;
+            right: -300px;
+            width: 900px;
+            height: 900px;
+            background: radial-gradient(circle, rgba(255, 20, 20, 0.08) 0%, rgba(0, 82, 204, 0.03) 50%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulse 10s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.08; }
+            50% { transform: scale(1.15); opacity: 0.12; }
+        }
+
+        /* Formas geométricas decorativas */
+        .bg-shape {
+            position: fixed;
+            opacity: 0.06;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .shape-1 {
+            width: 700px;
+            height: 600px;
+            background: var(--rojo);
+            top: -300px;
+            left: -200px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .shape-2 {
+            width: 600px;
+            height: 500px;
+            background: var(--azul);
+            bottom: -200px;
+            right: -100px;
+            clip-path: polygon(0% 50%, 50% 0%, 100% 50%, 50% 100%);
+            animation: float 18s ease-in-out infinite reverse;
+        }
+
+        .shape-3 {
+            width: 500px;
+            height: 500px;
+            background: var(--verde-lima);
+            top: 60%;
+            right: -100px;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(50px) rotate(5deg); }
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 0 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--blanco);
+            padding: 18px 0;
+            border-bottom: 3px solid var(--rojo);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--rojo);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #999;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 50px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--rojo), var(--azul));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ===== HEADER PRINCIPAL ===== */
+        .header {
+            background: var(--blanco);
+            padding: 90px 30px 70px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 70px;
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--rojo) 0%, var(--naranja) 25%, var(--amarillo) 50%, var(--azul) 75%, var(--purpura) 100%);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 3rem;
+            opacity: 0.1;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--rojo), var(--azul), var(--purpura));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+            font-weight: 500;
+        }
+
+        /* ===== SECCIONES PRINCIPALES ===== */
+        section {
+            margin-bottom: 80px;
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        section:nth-child(1) { animation-delay: 0s; }
+        section:nth-child(2) { animation-delay: 0.1s; }
+        section:nth-child(3) { animation-delay: 0.2s; }
+        section:nth-child(4) { animation-delay: 0.3s; }
+        section:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            font-family: 'Fredoka', sans-serif;
+            color: #000;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--rojo), var(--azul));
+            border-radius: 2px;
+        }
+
+        /* ===== ESTRATEGIA ===== */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .strategy-card {
+            background: var(--blanco);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+            position: relative;
+        }
+
+        .strategy-card:nth-child(1) {
+            border-left-color: var(--rojo);
+        }
+
+        .strategy-card:nth-child(2) {
+            border-left-color: var(--azul);
+        }
+
+        .strategy-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        .strategy-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .strategy-card p {
+            color: #666;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .strategy-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .strategy-badge.nike {
+            background: rgba(255, 20, 20, 0.15);
+            color: var(--rojo);
+        }
+
+        .strategy-badge.adidas {
+            background: rgba(0, 82, 204, 0.15);
+            color: var(--azul);
+        }
+
+        /* ===== OBJETIVOS ===== */
+        .objectives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .objective-card {
+            background: var(--blanco);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .objective-card:nth-child(1) { border-top-color: var(--rojo); }
+        .objective-card:nth-child(2) { border-top-color: var(--azul); }
+        .objective-card:nth-child(3) { border-top-color: var(--rojo); }
+        .objective-card:nth-child(4) { border-top-color: var(--azul); }
+
+        .objective-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .objective-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .objective-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .objective-card li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .objective-card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: var(--verde-lima);
+            font-size: 1.2rem;
+        }
+
+        /* ===== TABLA KPIs ===== */
+        .kpi-table-container {
+            background: var(--blanco);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            margin-top: 50px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .kpi-table thead {
+            background: linear-gradient(135deg, var(--rojo), var(--azul));
+            color: var(--blanco);
+        }
+
+        .kpi-table th {
+            padding: 20px;
+            text-align: left;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .kpi-table tbody tr:hover {
+            background: #f5f5f5;
+            transition: all 0.2s ease;
+        }
+
+        .metric-row {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .nike-value {
+            color: var(--rojo);
+            font-weight: 700;
+        }
+
+        .adidas-value {
+            color: var(--azul);
+            font-weight: 700;
+        }
+
+        .winner-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .winner-nike {
+            background: rgba(255, 20, 20, 0.2);
+            color: var(--rojo);
+        }
+
+        .winner-adidas {
+            background: rgba(0, 82, 204, 0.2);
+            color: var(--azul);
+        }
+
+        /* ===== INSIGHTS ===== */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .insights-card {
+            background: var(--blanco);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .insights-card:nth-child(1) {
+            border-left-color: var(--rojo);
+        }
+
+        .insights-card:nth-child(2) {
+            border-left-color: var(--azul);
+        }
+
+        .insights-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        .insights-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .insights-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insights-list li {
+            padding: 12px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .insights-list li:last-child {
+            border-bottom: none;
+        }
+
+        .insights-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: var(--naranja);
+            font-size: 1rem;
+        }
+
+        /* ===== PROPUESTAS DE MEJORA ===== */
+        .improvements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .improvement-card {
+            background: linear-gradient(135deg, var(--blanco), #f9f9f9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border: 2px solid #e8e8e8;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .improvement-card:hover {
+            border-color: var(--amarillo);
+            box-shadow: 0 15px 40px rgba(255, 214, 0, 0.2);
+            transform: translateY(-8px);
+        }
+
+        .improvement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .improvement-card h4 {
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+            font-family: 'Fredoka', sans-serif;
+            color: #000;
+        }
+
+        .improvement-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .improvement-impact {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--amarillo), var(--naranja));
+            color: var(--blanco);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== CHARTS ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .chart-container {
+            background: var(--blanco);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        .chart-container h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .chart-canvas {
+            position: relative;
+            height: 250px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: linear-gradient(135deg, #1a1a1a, #333);
+            color: var(--blanco);
+            padding: 40px 30px;
+            text-align: center;
+            margin-top: 100px;
+            border-top: 3px solid var(--rojo);
+        }
+
+        .footer-content p {
+            font-size: 1rem;
+            margin: 10px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-accent {
+            color: var(--amarillo);
+            font-weight: 700;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                gap: 25px;
+                font-size: 0.85rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .strategy-grid, .objectives-grid, .improvements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-table {
+                font-size: 0.85rem;
+            }
+
+            .kpi-table th, .kpi-table td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo-section">
+                <div class="logo">⚽ MUNDIAL 2026</div>
+                <div class="logo-sub">Strategic Marketing Analysis</div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#strategy">Estrategia</a></li>
+                <li><a href="#objectives">Objetivos</a></li>
+                <li><a href="#kpis">KPIs</a></li>
+                <li><a href="#insights">Insights</a></li>
+                <li><a href="#improvements">Mejoras</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header Principal -->
+    <div class="header">
+        <h1>FIFA World Cup 2026 - Análisis Estratégico</h1>
+        <p>Comparativa de estrategias digitales: Nike vs Adidas en el mayor evento deportivo global</p>
+    </div>
+
+    <div class="container">
+        <!-- 1. ESTRATEGIA POR CAMPAÑA -->
+        <section id="strategy">
+            <h2 class="section-title">📋 Estrategia por Campaña</h2>
+            
+            <div class="strategy-grid">
+                <div class="strategy-card">
+                    <h3>🔴 Estrategia Nike</h3>
+                    <p><strong>Enfoque Principal:</strong> Conexión emocional y engagement comunitario a través de influencers y creadores de contenido. Prioriza la construcción de una narrativa de inspiración y movimiento global.</p>
+                    <p style="margin-top: 15px;"><strong>Canales Clave:</strong> Social media, influencer partnerships, contenido de larga duración, storytelling emocional.</p>
+                    <p style="margin-top: 15px;"><strong>Público Objetivo:</strong> Millennials y Gen Z apasionados por deportes, con énfasis en comunidades multiculturales.</p>
+                    <span class="strategy-badge nike">Nike</span>
+                </div>
+
+                <div class="strategy-card">
+                    <h3>🔵 Estrategia Adidas</h3>
+                    <p><strong>Enfoque Principal:</strong> Rendimiento y conversión inmediata con contenido optimizado. Enfatiza los beneficios del producto y genera call-to-action claros para impulsar compras.</p>
+                    <p style="margin-top: 15px;"><strong>Canales Clave:</strong> Publicidad pagada, content marketing optimizado, videos cortos y concisos, mensajes directos de producto.</p>
+                    <p style="margin-top: 15px;"><strong>Público Objetivo:</strong> Consumidores activos en búsqueda de soluciones y productos, con alta intención de compra.</p>
+                    <span class="strategy-badge adidas">Adidas</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. OBJETIVOS DE CADA CAMPAÑA -->
+        <section id="objectives">
+            <h2 class="section-title">🎯 Objetivos de Cada Campaña</h2>
+            
+            <div class="objectives-grid">
+                <div class="objective-card">
+                    <h4>🔴 Nike - Objetivo 1: Alcance Masivo</h4>
+                    <ul>
+                        <li>Alcanzar 2.1M+ usuarios únicos</li>
+                        <li>Generar 4.5M+ impresiones</li>
+                        <li>Posicionar marca como líder en inspiración global</li>
+                        <li>Crear conversaciones virales en redes sociales</li>
+                    </ul>
+                </div>
+
+                <div class="objective-card">
+                    <h4>🔵 Adidas - Objetivo 1: Conversión Directa</h4>
+                    <ul>
+                        <li>Generar 5,800+ conversiones</li>
+                        <li>Lograr ROAS de 5.2x</li>
+                        <li>Optimizar cada peso invertido en publicidad</li>
+                        <li>Incrementar ticket promedio de compra</li>
+                    </ul>
+                </div>
+
+                <div class="objective-card">
+                    <h4>🔴 Nike - Objetivo 2: Engagement Comunitario</h4>
+                    <ul>
+                        <li>Alcanzar engagement rate de 6.2%+</li>
+                        <li>Fortalecer relación con comunidad</li>
+                        <li>Aumentar tiempo de interacción con contenido</li>
+                        <li>Generar contenido generado por usuarios</li>
+                    </ul>
+                </div>
+
+                <div class="objective-card">
+                    <h4>🔵 Adidas - Objetivo 2: Eficiencia de Medios</h4>
+                    <ul>
+                        <li>Maximizar frecuencia de exposición (2.37x)</li>
+                        <li>Mejorar CTR a 1.9%</li>
+                        <li>Lograr VTR de 52%+ en videos</li>
+                        <li>Reducir costo por conversión</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. TABLA DE KPIs -->
+        <section id="kpis">
+            <h2 class="section-title">📊 Tabla Comparativa de KPIs</h2>
+            
+            <div class="kpi-table-container">
+                <div class="table-responsive">
+                    <table class="kpi-table">
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Nike</th>
+                                <th>Adidas</th>
+                                <th>Diferencia</th>
+                                <th>Ganador</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="metric-row">Alcance</td>
+                                <td class="nike-value">2,100,000</td>
+                                <td class="adidas-value">1,600,000</td>
+                                <td>+500,000</td>
+                                <td><span class="winner-badge winner-nike">Nike</span></td>
+                            </tr>
+                            <tr>
+                                <td class="metric-row">Impresiones</td>
+                                <td class="nike-value">4,500,000</td>
+                                <td class="adidas-value">3,800,000</td>
+                                <td>+700,000</td>
+                                <td><span class="winner-badge winner-nike">Nike</span></td>
+                            </tr>
+                            <tr>
+                                <td class="metric-row">Frecuencia</td>
+                                <td class="nike-value">2.14</td>
+                                <td class="adidas-value">2.37</td>
+                                <td>+0.23</td>
+                                <td><span class="winner-badge winner-adidas">Adidas</span></td>
+                            </tr>
+                            <tr>
+                                <td class="metric-row">CTR (%)</td>
+                                <td class="nike-value">0.85%</td>
+                                <td class="adidas-value">1.9%</td>
+                                <td>+1.05%</td>
+                                <td><span class="winner-badge winner-adidas">Adidas</span></td>
+                            </tr>
+                            <tr>
+                                <td class="metric-row">Engagement Rate (%)</td>
+                                <td class="nike-value">6.2%</td>
+                                <td class="adidas-value">3.1%</td>
+                                <td>+3.1%</td>
+                                <td><span class="winner-badge winner-nike">Nike</span></td>
+                            </tr>
+                            <tr>
+                                <td class="metric-row">VTR (%)</td>
+                                <td class="nike-value">38%</td>
+                                <td class="adidas-value">52%</td>
+                                <td>+14%</td>
+                                <td><span class="winner-badge winner-adidas">Adidas</span></td>
+                            </tr>
+                            <tr>
+                                <td class="metric-row">Conversiones</td>
+                                <td class="nike-value">4,200</td>
+                                <td class="adidas-value">5,800</td>
+                                <td>+1,600</td>
+                                <td><span class="winner-badge winner-adidas">Adidas</span></td>
+                            </tr>
+                            <tr>
+                                <td class="metric-row">ROAS</td>
+                                <td class="nike-value">3.8</td>
+                                <td class="adidas-value">5.2</td>
+                                <td>+1.4</td>
+                                <td><span class="winner-badge winner-adidas">Adidas</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts de KPIs -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Alcance Comparativo</h3>
+                    <div class="chart-canvas">
+                        <canvas id="reachChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Conversiones</h3>
+                    <div class="chart-canvas">
+                        <canvas id="conversionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Engagement Rate</h3>
+                    <div class="chart-canvas">
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>ROAS (Return on Ad Spend)</h3>
+                    <div class="chart-canvas">
+                        <canvas id="roasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. INSIGHTS DETECTADOS -->
+        <section id="insights">
+            <h2 class="section-title">💡 Análisis Detallado e Insights</h2>
+
+            <div class="insights-grid">
+                <div class="insights-card">
+                    <h3 class="insights-title">🎯 Insights Nike</h3>
+                    <ul class="insights-list">
+                        <li>Mayor alcance e impresiones (2.1M y 4.5M respectivamente) = Estrategia de visibilidad exitosa</li>
+                        <li>Mejor engagement rate (6.2%) con alta conversación en redes = Conexión emocional fuerte</li>
+                        <li>Mayor conexión emocional con la audiencia a través de influencers = Modelo de amplificación efectivo</li>
+                        <li>VTR limitado (38%) por duración prolongada de contenido = Oportunidad de optimización</li>
+                        <li>CTR bajo (0.85%) - Necesita optimizar llamados a la acción = Gap en conversión inmediata</li>
+                        <li>ROAS menor (3.8) - Enfoque en conciencia sobre conversión inmediata = Trade-off estratégico válido</li>
+                    </ul>
+                </div>
+
+                <div class="insights-card">
+                    <h3 class="insights-title">🏆 Insights Adidas</h3>
+                    <ul class="insights-list">
+                        <li>Mayor CTR (1.9%) - Superior capacidad de generación de clics = Copy y CTA altamente efectivos</li>
+                        <li>Mayor VTR (52%) - Mejor retención de audiencia en videos = Contenido conciso y atractivo</li>
+                        <li>Más conversiones (5,800 vs 4,200) = 38% más conversiones absoluto = Eficiencia de funnel superior</li>
+                        <li>Mejor ROAS (5.2) - Máxima eficiencia en rendimiento de inversión = Targeting y optimización preciso</li>
+                        <li>Menor ER (3.1%) - Oportunidad para incrementar participación comunitaria = Potencial de crecimiento</li>
+                        <li>Contenido emocional altamente efectivo para generación de conversiones = Balance perfecto estrategia/resultados</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. PROPUESTAS DE MEJORA -->
+        <section id="improvements">
+            <h2 class="section-title">🚀 Propuestas de Mejoras Estratégicas</h2>
+
+            <div class="improvements-grid">
+                <div class="improvement-card">
+                    <div class="improvement-icon">🎬</div>
+                    <h4>Nike: Optimizar Duración de Contenido</h4>
+                    <p>Reducir duración promedio de videos de larga forma a 60-90 segundos. VTR está 14 puntos por debajo de Adidas debido a fatiga del viewer.</p>
+                    <span class="improvement-impact">Alto Impacto</span>
+                </div>
+
+                <div class="improvement-card">
+                    <div class="improvement-icon">🎯</div>
+                    <h4>Nike: Fortalecer Call-to-Action</h4>
+                    <p>Implementar CTAs más claros y directos sin comprometer storytelling. CTR de 0.85% puede mejorar a 1.5%+ con optimización de mensaje y diseño.</p>
+                    <span class="improvement-impact">Alto Impacto</span>
+                </div>
+
+                <div class="improvement-card">
+                    <div class="improvement-icon">👥</div>
+                    <h4>Adidas: Incrementar Engagement Comunitario</h4>
+                    <p>Implementar estrategia de community management más activa. ER de 3.1% es oportunidad de conversión adicional. Incorporar UGC y eventos interactivos.</p>
+                    <span class="improvement-impact">Medio Impacto</span>
+                </div>
+
+                <div class="improvement-card">
+                    <div class="improvement-icon">📈</div>
+                    <h4>Ambas: Integración Omnichannel</h4>
+                    <p>Crear experiencia conectada entre social, display, email y retail. Retargeting inteligente para Nike y nurturing de community para Adidas mejorará conversión total.</p>
+                    <span class="improvement-impact">Alto Impacto</span>
+                </div>
+
+                <div class="improvement-card">
+                    <div class="improvement-icon">🔍</div>
+                    <h4>Ambas: Testing Continuo A/B</h4>
+                    <p>Implementar framework de experimentación riguroso. Testing de creatividades, audiencias y mensajes puede mejorar eficiencia 15-25% en ambas campañas.</p>
+                    <span class="improvement-impact">Alto Impacto</span>
+                </div>
+
+                <div class="improvement-card">
+                    <div class="improvement-icon">💬</div>
+                    <h4>Nike: Hybrid Approach</h4>
+                    <p>Combinar fortalezas (alto ER) con optimización de conversión. Implementar retargeting de audiencias comprometidas con mensajes de conversión directa.</p>
+                    <span class="improvement-impact">Medio-Alto Impacto</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>⚽ <span class="footer-accent">FIFA World Cup 2026</span> - Strategic Marketing Analysis Dashboard ⚽</p>
+            <p style="margin-top: 15px; color: #ccc;">Análisis comparativo de estrategias digitales Nike vs Adidas | Generado con datos optimizados para Mundial 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        const colors = {
+            nike: '#FF1414',
+            adidas: '#0052CC',
+            gold: '#FFD600'
+        };
+
+        Chart.defaults.color = '#999';
+        Chart.defaults.borderColor = '#e0e0e0';
+        Chart.defaults.font.family = "'Poppins', sans-serif";
+
+        // 1. Alcance
+        const reachCtx = document.getElementById('reachChart').getContext('2d');
+        new Chart(reachCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nike (2.1M)', 'Adidas (1.6M)'],
+                datasets: [{
+                    data: [2.1, 1.6],
+                    backgroundColor: [colors.nike, colors.adidas],
+                    borderColor: '#fff',
+                    borderWidth: 5,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 13, weight: 'bold' }, padding: 20, usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+        // 2. Conversiones
+        const conversionCtx = document.getElementById('conversionChart').getContext('2d');
+        new Chart(conversionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nike (4,200)', 'Adidas (5,800)'],
+                datasets: [{
+                    data: [4200, 5800],
+                    backgroundColor: [colors.nike, colors.adidas],
+                    borderColor: '#fff',
+                    borderWidth: 5,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 13, weight: 'bold' }, padding: 20, usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+        // 3. Engagement
+        const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+        new Chart(engagementCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nike (6.2%)', 'Adidas (3.1%)'],
+                datasets: [{
+                    data: [6.2, 3.1],
+                    backgroundColor: [colors.nike, colors.adidas],
+                    borderColor: '#fff',
+                    borderWidth: 5,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 13, weight: 'bold' }, padding: 20, usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+        // 4. ROAS
+        const roasCtx = document.getElementById('roasChart').getContext('2d');
+        new Chart(roasCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nike (3.8)', 'Adidas (5.2)'],
+                datasets: [{
+                    data: [3.8, 5.2],
+                    backgroundColor: [colors.nike, colors.adidas],
+                    borderColor: '#fff',
+                    borderWidth: 5,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 13, weight: 'bold' }, padding: 20, usePointStyle: true }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
